@@ -13,11 +13,11 @@ export class Size {
     }
 
     get rectSize(){
-        return [this.left, this.top, this.width, this.height]
+        return [this.left, this.top, this.width, this.height].map(value => Math.floor(value))
     }
 
     get bounds(){
-        return [this.left, this.top, this.right, this.bottom]
+        return [this.left, this.top, this.right, this.bottom].map(value => Math.floor(value))
     }
 
     setPosition({x,y}) {

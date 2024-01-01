@@ -1,94 +1,103 @@
-import { box } from "./componentTypes.js"
+import { box, text } from "./componentTypes.js"
 import { clearListeners, setClickListener } from "./listeners.js"
+import { logger } from "./log.js"
 
 import { Size, getScreenSize } from "./size.js"
 
 
-function createCanvas(){
-    
+function createCanvas() {
+
     const canvas = document.createElement('CANVAS')
-    const {x,y} = getScreenSize()
+    const { x, y } = getScreenSize()
     const dpr = window.devicePixelRatio
-    canvas.style.width = x 
-    canvas.style.height = y 
+    canvas.style.width = x
+    canvas.style.height = y
     canvas.width = x * dpr
     canvas.height = y * dpr
-    
 
     const context = canvas.getContext('2d')
 
-    context.scale(dpr,dpr)
+    context.scale(dpr, dpr)
+    context.imageSmoothingEnabled = false
     
-    return {context, canvas}
+
+
+    return { context, canvas }
 }
 
-const {context, canvas} = createCanvas()
+const { context, canvas } = createCanvas()
 
-export function draw({children:appComponents}){
+export function draw({ children: components }) {
     context.reset()
-  /*   const {top, left, right, bottom} = getExtent() */
+    context.textRendering = "geometricPrecision";
 
-    const screenSize = getScreenSize()
-    const dpr = window.devicePixelRatio
-    
-    canvas.width = screenSize.width * dpr
-    canvas.height = screenSize.height * dpr
+    const size = getScreenSize()
 
-    context.clearRect(...screenSize.rectSize)
-    context.fillRect(...screenSize.rectSize)
+    canvas.width = size.width
+    canvas.height = size.height
 
-    const ySegmentCount = appComponents.length
+    context.clearRect(...size.rectSize)
+    context.fillRect(...size.rectSize)
 
-    const ySegmentHeight = screenSize.height / ySegmentCount
+    traverseComponents(components, size, context)
 
-  
+}
 
-    const center = screenSize.getCenter()
-    appComponents.forEach((item, i) => {
+function traverseComponents(components, parentSize, ctx) {
 
-        
-        if(item?.type === box){
+    // TODO: Fix later
+    const size = parentSize
 
-            item.size ??= new Size({width: screenSize.width, height: ySegmentHeight})
+    const ySegmentCount = components?.length ?? 1
 
-            item.size.setPosition({
+    const ySegmentHeight = size.height / ySegmentCount
+
+    const center = size.getCenter()
+
+    components.forEach((component, i) => {
+
+        if (component?.size) {
+            component?.size?.setPosition({
                 x: center.x,
-                y: ((i+1) * (ySegmentHeight) ) - ySegmentHeight / 2
+                y: ((i + 1) * (ySegmentHeight)) - ySegmentHeight / 2
             })
+        }
 
-            context.clearRect(...item.size.rectSize)
-            context.fillStyle = item?.fill ?? 'white'        
-            context.fillRect(...item.size.rectSize)
-    
-            context.strokeStyle = item?.color ?? 'blue'
-            context.lineWidth = item?.border ?? 2
-            context.strokeRect(...item.size.rectSize)
+        if (component.type === text) {
            
+            
+                        ctx.fillStyle = "white"
+                        ctx.font = `${component.fontSize ?? 12}pt serif`
+            const textMetrics = ctx.measureText(component.text)
+
+            const textWidth = textMetrics.actualBoundingBoxRight + textMetrics.actualBoundingBoxLeft
+
+
+            const [left, top, rigth, bottom] = size.bounds
+            logger(textMetrics.fontBoundingBoxAscent)
+            ctx.fillText(component.text, Math.floor((left + ((rigth - left) / 2)) - textWidth / 2), Math.floor(textMetrics.fontBoundingBoxDescent + top + ((bottom - top) / 2)), Math.floor(rigth - left));
 
         }
 
+
+        if (component?.type === box) {
+            drawBox(component, ctx)
+        }
+
+        if (component?.children) {
+            traverseComponents(component.children, component.size, ctx)
+        }
     });
-
-
 }
 
-function traverseComponents(item){
+function drawBox(item, ctx) {
+    ctx.clearRect(...item.size.rectSize)
+    ctx.fillStyle = item?.fill ?? 'white'
+    ctx.fillRect(...item.size.rectSize)
 
-    const [boxWidth, boxHeight] = item?.size ?? [0,0]
-
-    const boxLeft =  Math.floor((right / 2) - (boxWidth / 2))
-    const boxTop = Math.floor((bottom / count * (i+1)) / 2 + (boxHeight / 2))
-    
-    if(item.onClick != null){
-        setClickListener([boxLeft, boxTop, boxLeft + boxWidth, boxTop + boxHeight], item.onClick)
-    }
-    context.clearRect(boxLeft, boxTop, boxWidth, boxHeight)
-    context.fillStyle = item?.fill ?? 'white'        
-    context.fillRect(boxLeft, boxTop, boxWidth, boxHeight)
-
-    context.strokeStyle = item?.color ?? 'blue'
-    context.lineWidth = item?.border ?? 2
-    context.strokeRect(boxLeft, boxTop, boxWidth, boxHeight)
+    ctx.strokeStyle = item?.color ?? 'blue'
+    ctx.lineWidth = item?.border ?? 2
+    ctx.strokeRect(...item.size.rectSize)
 }
 
 export default canvas
