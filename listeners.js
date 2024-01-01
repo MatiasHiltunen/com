@@ -1,8 +1,11 @@
 let clickListeners = []
 
-export function setClickListener(extent, callback){
+export function setClickListener(id, size, callback){
+    clickListeners.push([id, size, callback])
+}
 
-    clickListeners.push([extent, callback])
+export function removeClickListener(id){
+    clickListeners = clickListeners.filter(([_id])=> _id !== id)
 }
 
 export function getClickListeners(){

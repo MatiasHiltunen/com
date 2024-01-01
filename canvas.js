@@ -1,19 +1,23 @@
+import { box } from "./componentTypes.js"
 import { clearListeners, setClickListener } from "./listeners.js"
-import { logger } from "./log.js"
-import { Size, getExtent, getScreenSize } from "./size.js"
+
+import { Size, getScreenSize } from "./size.js"
 
 
 function createCanvas(){
     
     const canvas = document.createElement('CANVAS')
     const {x,y} = getScreenSize()
-    canvas.style.width = x
-    canvas.style.height = y
-    canvas.width = x
-    canvas.height = y
+    const dpr = window.devicePixelRatio
+    canvas.style.width = x 
+    canvas.style.height = y 
+    canvas.width = x * dpr
+    canvas.height = y * dpr
     
 
     const context = canvas.getContext('2d')
+
+    context.scale(dpr,dpr)
     
     return {context, canvas}
 }
@@ -25,37 +29,33 @@ export function draw({children:appComponents}){
   /*   const {top, left, right, bottom} = getExtent() */
 
     const screenSize = getScreenSize()
+    const dpr = window.devicePixelRatio
     
-    canvas.width = screenSize.width
-    canvas.height = screenSize.height
+    canvas.width = screenSize.width * dpr
+    canvas.height = screenSize.height * dpr
 
     context.clearRect(...screenSize.rectSize)
     context.fillRect(...screenSize.rectSize)
 
-    const count = appComponents.length
+    const ySegmentCount = appComponents.length
 
-    clearListeners()
+    const ySegmentHeight = screenSize.height / ySegmentCount
+
+  
 
     const center = screenSize.getCenter()
     appComponents.forEach((item, i) => {
 
         
-        if(item?.type === 'box'){
+        if(item?.type === box){
 
-            console.log(item.size)
-
-            item.size ??= new Size({width: 10, height: 10})
+            item.size ??= new Size({width: screenSize.width, height: ySegmentHeight})
 
             item.size.setPosition({
                 x: center.x,
-                y: (center.y / count) * (i+1)
+                y: ((i+1) * (ySegmentHeight) ) - ySegmentHeight / 2
             })
 
-            console.log(item.size)
-            
-            if(item.onClick != null){
-                setClickListener(item.size, item.onClick)
-            }
             context.clearRect(...item.size.rectSize)
             context.fillStyle = item?.fill ?? 'white'        
             context.fillRect(...item.size.rectSize)
