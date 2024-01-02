@@ -1,4 +1,4 @@
-import { logSettings } from "./config.js"
+import { logOptions, logSettings } from "./config.js"
 
 export function createLogger(settings){
     
@@ -36,18 +36,23 @@ export function createLogger(settings){
         font-size: 0.5em;
         gap: 4px;
         `
-    document.body.append(logElement, showLogButton)
+
+        if(settings.includes(logOptions.inApp)){
+            document.body.append(logElement, showLogButton)
+        }
 
     return function logger(...args){
     
         console.log(args)
     
+        if(settings.includes(logOptions.inApp)){
+
         logData.unshift(...args)   
     
         logElement.innerHTML += '<div style="background-color: #fff;">' + args.map((log)=> {
             return `<p>${JSON.stringify({log})} </p>`
         }).join('') + "</div>"
-    
+    }    
     }
 }
 

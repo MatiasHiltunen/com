@@ -1,15 +1,27 @@
 
+export const alignCenter = 1
+export const alignStart = 2
+export const alignSpaceBetween = 3
+export const alignEnd = 4
+
+export const row = 1
+export const column = 2
+
 export class Size {
     
 
-    constructor({width, height, x = 0, y = 0}){
-        this.left = x 
-        this.top = y
-        this.right = width
-        this.bottom = height
+    constructor({width, height, x = 0, y = 0, alingOnAxisX, alingOnAxisY, direction}){
+        this.left = Math.floor(x)
+        this.top = Math.floor(y)
+        this.width = Math.floor(width)
+        this.height = Math.floor(height)
 
-        this.width = width
-        this.height = height
+        // TODO: Remove these
+        this.right = Math.floor(width)
+        this.bottom = Math.floor(height)
+        this.alingOnAxisX = alingOnAxisX ?? alignCenter
+        this.alingOnAxisY = alingOnAxisY ?? alignCenter
+        this.direction = direction ?? column
     }
 
     get rectSize(){

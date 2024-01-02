@@ -1,12 +1,13 @@
 import { none } from "./componentTypes.js";
 import { theme } from "./config.js";
-import { setClickListener } from "./listeners.js";
+import { getClickListeners, setClickListener } from "./listeners.js";
 
 export class Component {
     type = none
     fill = theme.fill
     color = theme.color
     border = theme.border
+    size = null
     
     constructor(type, onClick){
         this.type = type
@@ -16,6 +17,15 @@ export class Component {
         }
     }
     
+    setSize(size){
+        this.size = size
+        const listeners = getClickListeners()
+
+        if(listeners[this.id]){
+            setClickListener(this.id, this.size, listeners[this.id][1])
+        }
+    }
+
     onClick(callback){   
         if(!this.size) throw new Error("Can not add click listener to a component without size")
 
@@ -23,4 +33,5 @@ export class Component {
     }
 
 }
+
 

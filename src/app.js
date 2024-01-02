@@ -1,82 +1,90 @@
 import { box, text } from "../componentTypes.js"
 import { logger } from "../log.js"
-import { Size } from "../size.js"
-import { Button } from "./components/button.js"
+import { Size, alignCenter, alignStart, row } from "../size.js"
+import { Box } from "./components/button.js"
+
 
 export const app = {
     children: [
-        new Button({
-            state: {
-                count: 0
-            },
-            border: 3,
-            color: 'red',
-            fill: 'grey',
-            size: new Size({
-                width: 100,
-                height: 40
+        new Box({
+            setSize: () => new Size({
+                width: 500,
+                height: 500,
+                alingOnAxisY: alignCenter,
+                direction: row
             }),
-            onClick(current) {
-                current.state.count++
-                current.color = 'blue'
-                current.size = new Size({ width: 200, height: 50 })
-                logger(current.state.count)
-            },
             children: [
-                {
-                    type: text,
-                    text: 'test',
-                    fontSize: 12
-                }
+                new Box({
+                    state: {
+                        count: 0
+                    },
+                    border: 3,
+                    color: 'red',
+                    fill: 'grey',
+                    setSize: () => new Size({
+                        width: 100,
+                        height: 40
+                    }),
+                    onClick(current) {
+                        current.state.count++
+                        current.children[0].text = 'count: ' + current.state.count
+                        current.fill = current.state.count % 2 === 0 ? 'blue' : 'green'
+                    },
+                    children: [
+                        {
+                            type: text,
+                            text: 'count',
+                            fontSize: 12
+                        }
+                    ]
+                }),
+                new Box({
+                    state: {
+                        count: 0
+                    },
+                    border: 3,
+                    color: 'red',
+                    fill: 'grey',
+                    setSize: () => new Size({
+                        width: 100,
+                        height: 40
+                    }),
+                    onClick(current) {
+                        current.state.count++
+                        current.fill = 'blue'
+                        logger(current.state.count)
+                    },
+                    children: [
+                        {
+                            type: text,
+                            text: 'Nappi',
+                            fontSize: 12
+                        }
+                    ]
+                }),
+                new Box({
+                    border: 3,
+                    color: 'red',
+                    fill: 'grey',
+                    setSize: () => new Size({
+                        width: 100,
+                        height: 40,
+                    }),
+                    onClick(current) {
+                        
+                        alert("Hello")
+                    },
+                    children: [
+                        {
+                            type: text,
+                            text: 'alert',
+                            fontSize: 12
+                        }
+                    ]
+                }),
             ]
         }),
-        new Button({
-            state: {
-                count: 0
-            },
-            border: 3,
-            color: 'red',
-            fill: 'grey',
-            size: new Size({
-                width: 100,
-                height: 40
-            }),
-            onClick(current) {
-                current.state.count++
-                current.color = 'blue'
-                current.size = new Size({ width: 200, height: 50 })
-                logger(current.state.count)
-            },
-            children: [
-                {
-                    type: text,
-                    text: 'eka nappi!',
-                    fontSize: 12
-                }
-            ]
-        }),
-        new Button({
-            border: 3,
-            color: 'red',
-            fill: 'grey',
-            size: new Size({
-                width: 100,
-                height: 40
-            }),
-            onClick(current) {
-
-                current.color = 'white'
-                current.size = new Size({ width: 200, height: 50 })
-                current.fill = 'black'
-            },
-            children: [
-                {
-                    type: text,
-                    text: 'toka nappi!',
-                    fontSize: 12
-                }
-            ]
-        }),
+        
         /* {
             type: box,
             fill: 'white',

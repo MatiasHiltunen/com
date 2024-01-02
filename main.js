@@ -12,17 +12,20 @@ function pointerEventHandler(e){
    
     const [x,y] = [e.clientX, e.clientY]
 
-    getClickListeners().forEach(([id, size, callback]) => {
+    const listeners = getClickListeners()
+    
+    
+    Object.values(listeners).forEach(([size, callback]) => {
         if(size.hasPoint({x,y})){
             callback()           
+            draw(app)
         }
     })
 
-    draw(app)
 }
 
-window.addEventListener('resize', resizeHandler)
 window.addEventListener('click', pointerEventHandler)
+window.addEventListener('resize', resizeHandler)
 
 function init(){
     document.body.style.display = 'flex'
@@ -31,7 +34,7 @@ function init(){
 
     document.body.append(canvas)
 
-    logger(app)
+    //createFpsCounter()
     draw(app)
 }
 

@@ -8,7 +8,7 @@ export const logOptions = {
     inApp: 5
 }
 
-export const logSettings = [logOptions.inApp, logOptions.console]
+export const logSettings = [logOptions.console]
 
 export const theme = {
     fill: 'white',
