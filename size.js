@@ -15,10 +15,13 @@ export class Size {
         this.top = Math.floor(y)
         this.width = Math.floor(width)
         this.height = Math.floor(height)
-
-        // TODO: Remove these
-        this.right = Math.floor(width)
-        this.bottom = Math.floor(height)
+        
+        this.right = this.left + this.width
+        this.bottom = this.top + this.height
+        this.offset = 0
+        this.siblingCount = 0
+        this.orderIndex = 0
+     
         this.alingOnAxisX = alingOnAxisX ?? alignCenter
         this.alingOnAxisY = alingOnAxisY ?? alignCenter
         this.direction = direction ?? column
@@ -39,14 +42,6 @@ export class Size {
         this.bottom = this.top + this.height
     }
 
-    getBounds(){
-        return {
-            left: this.left,
-            top: this.top,
-            right: this.right,
-            bottom: this.bottom
-        }
-    }
 
     getCenter(){
         return {
@@ -60,11 +55,42 @@ export class Size {
     }
 }
 
+export class RelativeSize extends Size {
+
+    relative = true
+
+
+
+    constructor(relativeWidth, relativeHeight,  options={}){
+       
+     
+
+        super({width:0, height:0, ...options})
+        this.relativeHeight = relativeHeight
+        this.relativeWidth = relativeWidth
+        this.height = Math.floor(relativeHeight * window.innerHeight)
+        this.width = Math.floor(relativeWidth * window.innerWidth)
+    }
+
+
+    update(context){
+
+
+        this.height = Math.floor(this.relativeHeight * context.screen.height)
+        this.width = Math.floor(this.relativeWidth * context.screen.width)
+    }
+}
+
+
 export function getScreenSize(){
+
+
 
     return new Size({
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
+        x: 0,
+        y: 0
     })
 }
 

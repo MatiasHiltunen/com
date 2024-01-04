@@ -16,3 +16,24 @@ export function getClickListeners() {
 export function clearListeners() {
     clickListeners = {}
 }
+
+
+
+let hoverListeners = {}
+
+export function setHoverListener(id, size, callback) {
+
+    hoverListeners[id] = [size, callback]
+}
+
+export function removeHoverListener(id) {
+    hoverListeners = Object.fromEntries(Object.entries(hoverListeners).filter(([_id]) => _id !== id))
+}
+
+export function getHoverListeners() {
+    return hoverListeners
+}
+
+export function clearHoverListeners() {
+    hoverListeners = {}
+}

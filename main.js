@@ -1,11 +1,14 @@
 
 import canvas, { draw } from "./canvas.js"
-import { getClickListeners } from "./listeners.js"
+import { getClickListeners, getHoverListeners } from "./listeners.js"
 import { logger } from "./log.js"
-import {app} from './src/app.js'
+import App from './src/app.js'
+
+
 
 function resizeHandler(){
-    draw(app)
+    App.update()
+    draw(App)
 }
 
 function pointerEventHandler(e){
@@ -16,14 +19,34 @@ function pointerEventHandler(e){
     
     
     Object.values(listeners).forEach(([size, callback]) => {
-        if(size.hasPoint({x,y})){
+        if(x >= size.left && x <= size.right && y >= size.top && y <= size.bottom){
             callback()           
-            draw(app)
+            App.update()
+            draw(App)
         }
     })
 
 }
+/*
+function pointerMove(e){
+    const [x,y] = [e.clientX, e.clientY]
 
+    const listeners = getHoverListeners()
+    
+    
+    Object.values(listeners).forEach(([size, callback]) => {
+        if(x >= size.left && x <= size.right && y >= size.top && y <= size.bottom){
+            callback(true)
+            document.body.style.cursor = 'pointer'  
+        } else {
+            callback(false)
+            document.body.style.cursor = 'default'
+        }
+        draw(app)
+    })
+}
+*/
+//window.addEventListener('mousemove', pointerMove)
 window.addEventListener('click', pointerEventHandler)
 window.addEventListener('resize', resizeHandler)
 
@@ -33,9 +56,12 @@ function init(){
     document.body.style.padding = 0
 
     document.body.append(canvas)
+    draw(App)
+    
+    logger(App)
 
     //createFpsCounter()
-    draw(app)
+   
 }
 
 document.addEventListener("DOMContentLoaded", init)
