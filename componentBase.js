@@ -1,7 +1,9 @@
 import { app, none, row, text } from "./componentTypes.js";
 import { theme } from "./config.js";
 import { getClickListeners, setClickListener, setHoverListener } from "./listeners.js";
-import { alignCenter, alignStart } from "./size.js";
+import { Size, alignCenter, alignStart } from "./size.js";
+
+
 
 export class Component {
     type = none
@@ -11,7 +13,10 @@ export class Component {
     size = null
     parentSize = null
     children = null
-    context = {}
+    context = {
+        activeClickPoint:null
+    }
+    onClick = null
     
     constructor(type){
         this.type = type
@@ -24,22 +29,23 @@ export class Component {
     }
 
     build(){
+
         
-        if(this.size.relative){
-            this.size.update(this.context)
+        if(this.onClick && this.context.activeClickPoint && this.size.hasPoint(this.context.activeClickPoint)){
+            // TODO: Add priority to top layer
+            this.onClick()
+            this.context.activeClickPoint = null
         }
 
+        if(this.size.relative){
+            this.size.updateGlobalSize(this.context.screen)
+        }
+        
+      
         if(this.children && Array.isArray(this.children)){
             this.size.siblingCount = this.children.length 
         }
         
-
-        const listeners = getClickListeners()
-
-        if(listeners[this.id]){
-            setClickListener(this.id, this.size, listeners[this.id][1])
-        }
-       
         const center = this.parentSize.getCenter()
 
         let childSegmentHeight = this.parentSize.direction === row ? this.parentSize.width : this.parentSize.height
@@ -86,21 +92,45 @@ export class Component {
       
 
             this.children.forEach((child,i)=> {
+                if(typeof child === 'function'){
+
+                    let component = child(this.context)
+
+                    
+                    const properties = {...component}
+                    
+                    component = new Component(component.type)
+                    
+                    for(const key in properties){
+                        component[key] = properties[key]
+                    }
+                    
+                    component.size = new Size({width: this.size.width, height: this.size.height})
+                    
+                    component.context = this.context
+                    component.parentSize = this.size
+                    component.size.orderIndex = i
+                    
+               
+                    component.build()
+
+                    return
+                    
+                }
                 child.context = this.context
                 child.parentSize = this.size
                 child.size.orderIndex = i
 
                 child.build()
+
             })
         }
 
+       
+
     }
 
-    onClick(callback){   
-        if(!this.size) throw new Error("Can not add click listener to a component without size")
 
-        setClickListener(this.id, this.size, callback) 
-    }
 
     onHover(callback){
         if(!this.size) throw new Error("Can not add hover listener to a component without size")
@@ -110,3 +140,20 @@ export class Component {
 }
 
 
+export class App extends Component {
+
+    constructor({ children, context={}}){
+        super(app)
+        this.children = children
+        this.context = {...this.context, ...context}
+    }
+
+    update({size, activeClickPoint}){
+        this.context.screen = size
+        this.context.activeClickPoint = activeClickPoint
+        this.size = size
+        this.parentSize = size
+        this.build()
+    }
+
+}

@@ -8,34 +8,34 @@ export const row = 1
 export const column = 2
 
 export class Size {
-    
 
-    constructor({width, height, x = 0, y = 0, alingOnAxisX, alingOnAxisY, direction}){
+
+    constructor({ width, height, x = 0, y = 0, alingOnAxisX, alingOnAxisY, direction }) {
         this.left = Math.floor(x)
         this.top = Math.floor(y)
         this.width = Math.floor(width)
         this.height = Math.floor(height)
-        
+
         this.right = this.left + this.width
         this.bottom = this.top + this.height
         this.offset = 0
         this.siblingCount = 0
         this.orderIndex = 0
-     
+
         this.alingOnAxisX = alingOnAxisX ?? alignCenter
         this.alingOnAxisY = alingOnAxisY ?? alignCenter
         this.direction = direction ?? column
     }
 
-    get rectSize(){
+    get rectSize() {
         return [this.left, this.top, this.width, this.height].map(value => Math.floor(value))
     }
 
-    get bounds(){
+    get bounds() {
         return [this.left, this.top, this.right, this.bottom].map(value => Math.floor(value))
     }
 
-    setPosition({x,y}) {
+    setPosition({ x, y }) {
         this.left = x - (this.width / 2)
         this.top = y - (this.height / 2)
         this.right = this.left + this.width
@@ -43,15 +43,25 @@ export class Size {
     }
 
 
-    getCenter(){
+    getCenter() {
         return {
             x: Math.floor((this.right - this.left) / 2),
             y: Math.floor((this.bottom - this.top) / 2)
         }
     }
 
-    hasPoint({x,y}){
+    hasPoint([x, y]) {
         return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom
+    }
+
+    update({ width, height, alingOnAxisX, alingOnAxisY, direction }) {
+
+        if (alingOnAxisX) this.alingOnAxisX = alingOnAxisX
+        if (alingOnAxisY) this.alingOnAxisY = alingOnAxisY
+        if (direction) this.direction = direction
+        if (width) this.width = width
+        if (height) this.height = height
+
     }
 }
 
@@ -61,28 +71,34 @@ export class RelativeSize extends Size {
 
 
 
-    constructor(relativeWidth, relativeHeight,  options={}){
-       
-     
+    constructor(relativeWidth, relativeHeight, options = {}) {
 
-        super({width:0, height:0, ...options})
+        super({ width: 0, height: 0, ...options })
         this.relativeHeight = relativeHeight
         this.relativeWidth = relativeWidth
-        this.height = Math.floor(relativeHeight * window.innerHeight)
-        this.width = Math.floor(relativeWidth * window.innerWidth)
+        this.height = Math.floor(relativeHeight * 1000)
+        this.width = Math.floor(relativeWidth * 1000)
     }
 
 
-    update(context){
+    update(relativeWidth, relativeHeight, options = {}) {
 
+        if (options?.alingOnAxisX) this.alingOnAxisX = options.alingOnAxisX
+        if (options?.alingOnAxisY) this.alingOnAxisY = options.alingOnAxisY
+        if (options?.direction) this.direction = options.direction
+        if (width) this.relativeWidth = relativeWidth
+        if (height) this.relativeHeight = relativeHeight
 
-        this.height = Math.floor(this.relativeHeight * context.screen.height)
-        this.width = Math.floor(this.relativeWidth * context.screen.width)
+    }
+
+    updateGlobalSize({ width, height }) {
+        this.width = Math.floor(this.relativeWidth * width)
+        this.height = Math.floor(this.relativeHeight * height)
     }
 }
 
 
-export function getScreenSize(){
+export function getScreenSize() {
 
 
 
@@ -94,8 +110,8 @@ export function getScreenSize(){
     })
 }
 
-export function getExtent(){
-    const {x,y} = getScreenSize()
+export function getExtent() {
+    const { x, y } = getScreenSize()
     return {
         left: 0,
         top: 0,

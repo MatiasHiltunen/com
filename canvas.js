@@ -1,62 +1,14 @@
-import { box, column, text } from "./componentTypes.js"
+import { box, text } from "./componentTypes.js"
 
-import { alignCenter, alignStart, getScreenSize, row } from "./size.js"
-
-let offScreenCanvasInUse = false
-let worker 
-
-
-
-function createCanvas() {
-
-    const canvas = document.createElement('CANVAS')
-    const size = getScreenSize()
-
-   
-
-    canvas.style.objectFit = 'contain'
-
-    const dpr = window.devicePixelRatio
-  
-    /*
-    if(window.Worker && window.OffscreenCanvas){    
-        offScreenCanvasInUse = true
-        worker = new Worker('worker.js')
-        console.log("using offscreen canvas with worker")
-        const offScreen = canvas.transferControlToOffscreen()   
-
-        worker.postMessage({canvas:offScreen}, [offScreen])
-        return {canvas, context:{}}
-    } */
-
-    const context = canvas.getContext('2d',{ alpha: false })
- 
-
- 
-    return { canvas, context }
-}
-
-const { canvas, context } = createCanvas()
-
-export function draw(app) {
+export function draw(app, canvas, context) {
+    
     
 
-    /*if(offScreenCanvasInUse && worker){
-        console.log(size)
-        worker.postMessage({app:components, size})
-        return
-    }*/
 
-    context.reset()
-
-
-    const dpr = window.devicePixelRatio
-    canvas.style.width = app.size.width + 'px'
-    canvas.style.height = app.size.height  + 'px'
 
     canvas.width = app.size.width 
     canvas.height = app.size.height 
-    //context.scale(dpr, dpr)
+
     context.imageSmoothingEnabled = false
     
     context.textRendering = "geometricPrecision";
@@ -68,17 +20,14 @@ export function draw(app) {
 }
 
 
-
-function traverseComponents(components, size, ctx) {
+export function traverseComponents(components, size, ctx) {
 
     
     components.forEach((component, i) => {
         
-    
-
-
         if (component.type === text) {
 
+            console.log("text",component.text)
 
             ctx.fillStyle = "white"
             ctx.font = `${component.fontSize ?? 12}pt serif`
@@ -127,4 +76,3 @@ function drawBox(item, ctx) {
     ctx.strokeRect(...item.size.rect)
 }
 
-export default canvas

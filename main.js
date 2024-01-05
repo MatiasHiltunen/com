@@ -1,30 +1,53 @@
 
-import canvas, { draw } from "./canvas.js"
-import { getClickListeners, getHoverListeners } from "./listeners.js"
-import { logger } from "./log.js"
-import App from './src/app.js'
+
+let worker
 
 
+if (window.Worker && window.OffscreenCanvas) {
+    worker = new Worker('worker.js', {
+        type: "module"
+    })
+ 
+ 
 
-function resizeHandler(){
-    App.update()
-    draw(App)
-}
-
-function pointerEventHandler(e){
-   
-    const [x,y] = [e.clientX, e.clientY]
-
-    const listeners = getClickListeners()
-    
-    
-    Object.values(listeners).forEach(([size, callback]) => {
-        if(x >= size.left && x <= size.right && y >= size.top && y <= size.bottom){
-            callback()           
-            App.update()
-            draw(App)
+    worker.addEventListener('message', (e)=>{
+        if(e.data.bitmap){
+            canvas.width = e.data.bitmap.width
+            canvas.height = e.data.bitmap.height
+            canvas.style.width = e.data.bitmap.width
+            canvas.style.height = e.data.bitmap.height
+            context.transferFromImageBitmap(e.data.bitmap);
         }
     })
+} else {
+    console.error("Workers are not supported with this browser, falling back to main thread rendering")
+}
+
+const canvas = document.createElement('CANVAS')
+canvas.style.width = window.innerWidth
+canvas.style.height = window.innerHeight
+
+const context = canvas.getContext("bitmaprenderer")
+
+function render(data = {}){
+   
+    data.screenSize = {
+        width: window.innerWidth,
+        height: window.innerHeight
+    }
+    
+    worker.postMessage(data)
+}
+
+function resizeHandler() {
+   render()
+}
+
+function pointerEventHandler(e) {
+
+    if(!worker) return
+
+    render({cursor: [e.clientX, e.clientY]})
 
 }
 /*
@@ -50,18 +73,21 @@ function pointerMove(e){
 window.addEventListener('click', pointerEventHandler)
 window.addEventListener('resize', resizeHandler)
 
-function init(){
+function init() {
+
+  
     document.body.style.display = 'flex'
     document.body.style.margin = 0
     document.body.style.padding = 0
 
     document.body.append(canvas)
-    draw(App)
-    
-    logger(App)
+    render()
+
 
     //createFpsCounter()
-   
+
 }
+
+
 
 document.addEventListener("DOMContentLoaded", init)
