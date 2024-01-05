@@ -11,12 +11,12 @@ if (window.Worker && window.OffscreenCanvas) {
  
 
     worker.addEventListener('message', (e)=>{
-        if(e.data.bitmap){
-            canvas.width = e.data.bitmap.width
-            canvas.height = e.data.bitmap.height
-            canvas.style.width = e.data.bitmap.width
-            canvas.style.height = e.data.bitmap.height
-            context.transferFromImageBitmap(e.data.bitmap);
+        if(e.data){
+            canvas.width = e.data.width
+            canvas.height = e.data.height
+            canvas.style.width = e.data.width
+            canvas.style.height = e.data.height
+            context.transferFromImageBitmap(e.data);
         }
     })
 } else {

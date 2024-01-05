@@ -27,19 +27,84 @@ export class Size {
         this.direction = direction ?? column
     }
 
+    get computedHeight() {
+        if(this.siblingCount > 0){
+            return Math.floor(this.height / this.siblingCount)
+        }
+    
+        return this.height
+    }
+
+    get computedWidth() {
+        if(this.siblingCount > 0){
+            return Math.floor(this.width / this.siblingCount)
+        }
+    
+        return this.width
+    }
+
     get rectSize() {
-        return [this.left, this.top, this.width, this.height].map(value => Math.floor(value))
+        return [this.left, this.top, this.width, this.height]
     }
 
     get bounds() {
-        return [this.left, this.top, this.right, this.bottom].map(value => Math.floor(value))
+        return [this.left, this.top, this.right, this.bottom]
+    }
+
+    computeAlingCenterY({parentSize,parentCenter,childSegmentWidth,childSegmentHeight}){
+
+
+
+        if(parentSize.direction === row){
+            this.setPosition({
+                x: (((this.orderIndex + 1) * (childSegmentWidth)) - (childSegmentWidth / 2)) + parentSize.left,
+                y: parentCenter.y + parentSize.top 
+            })
+        } else {
+            this.setPosition({
+                x: parentCenter.x + parentSize.left,
+                y: (((this.orderIndex  + 1) * (childSegmentHeight)) - (childSegmentHeight / 2)) + parentSize.top 
+            })
+        }
+
+    }
+
+    computeAlignStartY({parentSize,childSegmentWidth,childSegmentHeight}){
+
+   
+
+        if(parentSize.direction === row){
+          
+            this.setPosition({
+                x: center.x + parentSize.left,
+                y: ((childSegmentWidth) * this.orderIndex) + parentSize.top 
+            })
+        } else {
+            
+            this.setPosition({
+                x: (childSegmentHeight * this.orderIndex) + parentSize.left,
+                y: center.y + parentSize.top 
+            })
+        }
+          
+     
+    }
+
+    computePosition({parentSize}){
+        const parentCenter = parentSize.getCenter()
+        const childSegmentWidth = parentSize.computedWidth
+        const childSegmentHeight = parentSize.computedHeight
+        const params = {parentSize,parentCenter,childSegmentWidth,childSegmentHeight}
+
+        if(this.alingOnAxisY === alignCenter) this.computeAlingCenterY(params)
+        if(this.alingOnAxisY === alignStart) this.computeAlignStartY(params)
     }
 
     setPosition({ x, y }) {
-        this.left = x - (this.width / 2)
-        this.top = y - (this.height / 2)
-        this.right = this.left + this.width
-        this.bottom = this.top + this.height
+        this.left = Math.floor(x - (this.width / 2))
+        this.top = Math.floor(y - (this.height / 2))
+        this.right = Math.floor(this.left + this.width)
+        this.bottom = Math.floor(this.top + this.height)
     }
 
 

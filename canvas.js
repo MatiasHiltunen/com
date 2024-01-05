@@ -27,7 +27,7 @@ export function traverseComponents(components, size, ctx) {
         
         if (component.type === text) {
 
-            console.log("text",component.text)
+         
 
             ctx.fillStyle = "white"
             ctx.font = `${component.fontSize ?? 12}pt serif`
