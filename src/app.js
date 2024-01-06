@@ -24,8 +24,8 @@ export default new App({
                     children: [
                         new Box({
                             size: new Size({width: 20, height: 20}),
-                            fill: "red"
-                
+                            fill: "red",
+                            rotation: (45 * Math.PI) / 180
                         }),
                         new Box({
                             size: new Size({width: 20, height: 20}),
@@ -36,18 +36,19 @@ export default new App({
                 new Box({
                     size: new Size({width: 60, height: 80}),
                     fill: "red",
-                    onClick(){
+   
 
+                    onClick(){
                         this.context.count++
+                        this.rotation = (this.context.count * Math.PI) / 180
+
+                        this.children[0].text = this.context.count
                         
                         if(this.context.count % 2 === 0){
                             this.size.update({width: 80, height:60})
                         } else {
                             this.size.update({width: 60, height:80})
                         }
-                    
-                   
-
                     },
                     children: [
                         new Text({text: "test", color: "black"})

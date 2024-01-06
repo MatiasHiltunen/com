@@ -2,14 +2,11 @@
 
 let worker
 
-
 if (window.Worker && window.OffscreenCanvas) {
     worker = new Worker('worker.js', {
         type: "module"
     })
  
- 
-
     worker.addEventListener('message', (e)=>{
         if(e.data){
             canvas.width = e.data.width

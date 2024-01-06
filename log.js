@@ -20,6 +20,7 @@ export function createLogger(settings){
         position: fixed;
         bottom: 1em;
         right: 1em;
+        z-index:1;
     `
     
     logElement.style.cssText = `
@@ -35,6 +36,7 @@ export function createLogger(settings){
         overflow: auto;
         font-size: 0.5em;
         gap: 4px;
+        z-index: 1;
         `
 
         if(settings.includes(logOptions.inApp)){

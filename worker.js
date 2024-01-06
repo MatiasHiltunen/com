@@ -1,35 +1,42 @@
-import { draw } from "./canvas.js";
+//import { draw } from "./canvas.js";
 import { Size } from "./size.js";
 
 import appInstance from "./src/app.js";
 
+let size = null
+let activeClickPoint = null
 
-const offscreenCanvas = new OffscreenCanvas(100,100)
-const context = offscreenCanvas.getContext("2d")
+function animate() {
 
-let isRendering = false
+
+    if(size){
+        appInstance.update({
+            size,
+            activeClickPoint:  activeClickPoint,
+        })
+
+        activeClickPoint = null
+        
+        const bitmap = appInstance.canvas.transferToImageBitmap()
+
+        self.postMessage(bitmap, [bitmap]);
+    }        
+
+    requestAnimationFrame(animate)
+
+}
+
+
 
 onmessage = (e) => {
 
-
-    if(e.data.screenSize && !isRendering){
-        isRendering = true
-        appInstance.update({
-            size: new Size({
-                width: e.data.screenSize.width,
-                height: e.data.screenSize.height,
-            }),
-            activeClickPoint: e.data.cursor
-        })
-    
-        draw(appInstance, offscreenCanvas, context)
-    
-        const bitmap = offscreenCanvas.transferToImageBitmap()
-        self.postMessage(bitmap, [bitmap]);
-        isRendering = false
-      
+    if(e.data.screenSize){
+        size = new Size(e.data.screenSize)  
     }
 
-
-
+    if(e.data.cursor){
+        activeClickPoint = e.data.cursor
+    }
 }
+
+animate()
