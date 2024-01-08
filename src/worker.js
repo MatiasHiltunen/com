@@ -1,7 +1,7 @@
 //import { draw } from "./canvas.js";
 import { Size } from "./size.js";
 
-import appInstance from "./src/app.js";
+import appInstance from "./app.js";
 
 let size = null
 let activeClickPoint = null
@@ -25,7 +25,6 @@ function animate() {
     requestAnimationFrame(animate)
 
 }
-
 
 
 onmessage = (e) => {

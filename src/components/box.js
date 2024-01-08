@@ -1,5 +1,5 @@
-import { Component } from "../../componentBase.js";
-import { box } from "../../componentTypes.js";
+import { Component } from "../componentBase.js";
+import { box } from "../componentTypes.js";
 
 export class Box extends Component {
 

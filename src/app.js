@@ -1,6 +1,6 @@
-import { App } from "../componentBase.js"
-import { text } from "../componentTypes.js"
-import { RelativeSize, Size, column} from "../size.js"
+import { App } from "./componentBase.js"
+import { text } from "./componentTypes.js"
+import { RelativeSize, Size, column} from "./size.js"
 import { Box } from "./components/box.js"
 import { Text } from "./components/text.js"
 

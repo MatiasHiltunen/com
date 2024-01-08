@@ -1,6 +1,6 @@
-import { Component } from "../../componentBase.js";
-import { text as textType } from "../../componentTypes.js";
-import { Size } from "../../size.js";
+import { Component } from "../componentBase.js";
+import { text as textType } from "../componentTypes.js";
+import { Size } from "../size.js";
 
 export class Text extends Component {
 

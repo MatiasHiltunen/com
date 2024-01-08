@@ -1,18 +1,22 @@
 
+import RendererWorker from './worker.js?worker&inline'
 
-let worker
+const canvas: HTMLCanvasElement = document.createElement('CANVAS') as HTMLCanvasElement
+canvas.style.width = window.innerWidth + 'px'
+canvas.style.height = window.innerHeight + 'px'
 
-if (window.Worker && window.OffscreenCanvas) {
-    worker = new Worker('worker.js', {
-        type: "module"
-    })
- 
+const context = canvas.getContext("bitmaprenderer")
+
+let worker = new RendererWorker()
+if (worker && window.OffscreenCanvas) {
+    
+
     worker.addEventListener('message', (e)=>{
-        if(e.data){
+        if(e.data && context){
+          
             canvas.width = e.data.width
             canvas.height = e.data.height
-            canvas.style.width = e.data.width
-            canvas.style.height = e.data.height
+
             context.transferFromImageBitmap(e.data);
         }
     })
@@ -20,13 +24,15 @@ if (window.Worker && window.OffscreenCanvas) {
     console.error("Workers are not supported with this browser, falling back to main thread rendering")
 }
 
-const canvas = document.createElement('CANVAS')
-canvas.style.width = window.innerWidth
-canvas.style.height = window.innerHeight
+interface RenderParams {
+    screenSize?: {
+        width: number,
+        height: number
+    } | null,
+    cursor?: [number, number] | null
+}
 
-const context = canvas.getContext("bitmaprenderer")
-
-function render(data = {}){
+function render(data: RenderParams){
    
     data.screenSize = {
         width: window.innerWidth,
@@ -37,10 +43,15 @@ function render(data = {}){
 }
 
 function resizeHandler() {
-   render()
+    const screenSize = {
+        width: window.innerWidth,
+        height: window.innerHeight
+    }
+
+   render({screenSize})
 }
 
-function pointerEventHandler(e) {
+function pointerEventHandler(e: PointerEvent) {
 
     if(!worker) return
 
@@ -67,18 +78,24 @@ function pointerMove(e){
 }
 */
 //window.addEventListener('mousemove', pointerMove)
-window.addEventListener('click', pointerEventHandler)
+window.addEventListener('pointerdown', pointerEventHandler)
 window.addEventListener('resize', resizeHandler)
 
 function init() {
 
   
-    document.body.style.display = 'flex'
-    document.body.style.margin = 0
-    document.body.style.padding = 0
+   
+    document.body.style.margin = 0 + 'px'
+    document.body.style.padding = 0 + 'px'
+    document.body.style.overflow = 'hidden'
+
+
+    canvas.style.width = '100%'
+    canvas.style.height = '100%'
+
 
     document.body.append(canvas)
-    render()
+    render({})
 
 
     //createFpsCounter()

@@ -1,6 +1,5 @@
 import { app, none } from "./componentTypes.js";
 import { theme } from "./config.js";
-import { setHoverListener } from "./listeners.js";
 import { Size } from "./size.js";
 
 
